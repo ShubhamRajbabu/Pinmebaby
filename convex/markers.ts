@@ -29,17 +29,30 @@ export const createMarker = mutation({
     handler: async (ctx, agrs) => {
         const { itemName, imageUrl, latitude, longitude } = agrs;
         try {
-            await ctx.db.insert('markers', {
+            const response = await ctx.db.insert('markers', {
                 itemName,
                 imageUrl,
                 latitude,
                 longitude,
                 createdAt: Date.now(),
             });
+            return response;
         } catch (error) {
             console.error("Error creating marker:", error);
             throw new Error("Failed to create marker. Please try again later.");
         }
 
+    }
+})
+
+export const deleteMarker = mutation({
+    args: { id: v.id("markers") },
+    handler: async (ctx, args) => {
+        const deleteItem = await ctx.db.get(args.id);
+        if (deleteItem) {
+            await ctx.db.delete(args.id);
+            return true;
+        }
+        return null;
     }
 })

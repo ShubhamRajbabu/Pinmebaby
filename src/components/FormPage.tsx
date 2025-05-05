@@ -16,24 +16,29 @@ const FormPage = ({ position, onSubmitSuccess }: {
         return imagePattern.test(url);
     };
 
-    const handleSubmitForm = (e: any) => {
+    const handleSubmitForm = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!isValidImageUrl(imgUrl)) {
             toast.error("Please enter a valid image URL (jpg, jpeg, png, etc.)");
             return;
         }
 
-        // Proceed with submitting the form data
-        createMarker({
-            itemName: itemName,
-            imageUrl: imgUrl,
-            latitude: position[0],
-            longitude: position[1],
-        });
-        setItemName("");
-        setImgUrl("");
-        onSubmitSuccess();
-        toast.success(`${itemName} got added successfully`);
+        try {
+            const response = await createMarker({
+                itemName: itemName,
+                imageUrl: imgUrl,
+                latitude: position[0],
+                longitude: position[1],
+            });
+            if (response) {
+                toast.success(`${itemName} got added successfully`);
+            }
+            setItemName("");
+            setImgUrl("");
+            onSubmitSuccess(); // close popup or update map
+        } catch (error) {
+            toast.error("Failed to add marker. Please try again.");
+        }
     };
 
 
