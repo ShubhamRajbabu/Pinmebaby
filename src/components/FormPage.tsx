@@ -11,33 +11,31 @@ const FormPage = ({ position, onSubmitSuccess }: {
     const [itemName, setItemName] = useState("");
     const [imgUrl, setImgUrl] = useState("");
 
-    const handleSubmitForm = async (e: React.FormEvent) => {
-        e.preventDefault(); // Prevent default form submission
-        if (!itemName.trim() || !imgUrl.trim()) {
-            toast.error("Item name and image URL are required");
-            return;
-        }
-        if (!/^https?:\/\/.+\..+/.test(imgUrl)) {
-            toast.error("Please enter a valid image URL (https://...)");
-            return;
-        }
-
-        try {
-            await createMarker({
-                itemName,
-                imageUrl: imgUrl,
-                latitude: position[0],
-                longitude: position[1],
-            });
-
-            setItemName("");
-            setImgUrl("");
-            toast.success(`${itemName} got added`);
-            onSubmitSuccess();
-        } catch (error) {
-            toast.error("Couldn't add the marker. Please try again");
-        }
+    const isValidImageUrl = (url: string) => {
+        const imagePattern = /\.(jpg|jpeg|png|gif|bmp|webp)$/i;
+        return imagePattern.test(url);
     };
+
+    const handleSubmitForm = (e: any) => {
+        e.preventDefault();
+        if (!isValidImageUrl(imgUrl)) {
+            toast.error("Please enter a valid image URL (jpg, jpeg, png, etc.)");
+            return;
+        }
+
+        // Proceed with submitting the form data
+        createMarker({
+            itemName: itemName,
+            imageUrl: imgUrl,
+            latitude: position[0],
+            longitude: position[1],
+        });
+        setItemName("");
+        setImgUrl("");
+        onSubmitSuccess();
+        toast.success(`${itemName} got added successfully`);
+    };
+
 
 
     return (
