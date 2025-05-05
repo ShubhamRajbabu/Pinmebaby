@@ -1,3 +1,4 @@
+import '../fixLeafletIcon';
 import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import FormPage from './FormPage';
