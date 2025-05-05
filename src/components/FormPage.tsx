@@ -10,32 +10,35 @@ const FormPage = ({ position, onSubmitSuccess }: {
     const createMarker = useMutation(api.markers.createMarker);
     const [itemName, setItemName] = useState("");
     const [imgUrl, setImgUrl] = useState("");
-    // Regex pattern for validating image URLs (ends with image extensions like .jpg, .png, .jpeg)
-    const imageUrlPattern = /\.(jpg|jpeg|png|gif|bmp|webp)$/i;
 
-    const handleSubmitForm = (e: any) => {
-        e.preventDefault();
-        // Validate image URL
-        if (!imageUrlPattern.test(imgUrl)) {
-            toast.error("Please enter a valid image URL.");
+    const handleSubmitForm = async (e: React.FormEvent) => {
+        e.preventDefault(); // Prevent default form submission
+        if (!itemName.trim() || !imgUrl.trim()) {
+            toast.error("Item name and image URL are required");
             return;
         }
+        if (!/^https?:\/\/.+\..+/.test(imgUrl)) {
+            toast.error("Please enter a valid image URL (https://...)");
+            return;
+        }
+
         try {
-            createMarker({
-                itemName: itemName,
+            await createMarker({
+                itemName,
                 imageUrl: imgUrl,
                 latitude: position[0],
                 longitude: position[1],
-            })
+            });
+
             setItemName("");
             setImgUrl("");
-            toast.success(`${itemName} got added newly`);
+            toast.success(`${itemName} got added`);
             onSubmitSuccess();
-
         } catch (error) {
             toast.error("Couldn't add the marker. Please try again");
         }
-    }
+    };
+
 
     return (
         <form onSubmit={handleSubmitForm} className="form-container">
