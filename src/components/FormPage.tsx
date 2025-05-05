@@ -11,15 +11,20 @@ const FormPage = ({ position, onSubmitSuccess }: {
     const [itemName, setItemName] = useState("");
     const [imgUrl, setImgUrl] = useState("");
 
-    const isValidImageUrl = (url: string) => {
-        const imagePattern = /\.(jpg|jpeg|png|gif|bmp|webp)$/i;
-        return imagePattern.test(url);
+    const isImageLoadable = (url: string): Promise<boolean> => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = url;
+            img.onload = () => resolve(true);
+            img.onerror = () => resolve(false);
+        });
     };
 
     const handleSubmitForm = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isValidImageUrl(imgUrl)) {
-            toast.error("Please enter a valid image URL (jpg, jpeg, png, etc.)");
+        const canLoad = await isImageLoadable(imgUrl);
+        if (!canLoad) {
+            toast.error("Invalid or inaccessible image URL");
             return;
         }
 
